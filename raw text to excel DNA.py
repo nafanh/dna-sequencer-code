@@ -75,4 +75,6 @@ for i in range(len(sample_2d)):
 df_no_int['Diff'] = diff_list
 print(df_no_int)
                
-    
+
+#exports data with compared to internal standard
+#export_excel_difference = df.to_csv('Export_data_difference.csv',sep=',')
