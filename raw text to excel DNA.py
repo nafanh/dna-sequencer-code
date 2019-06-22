@@ -84,12 +84,21 @@ def sample_distance(filtered_data):
     # exports data with compared to internal standard
     # export_excel_difference = df.to_csv('Export_data_difference.csv',sep=',')
 
+# Outputs the polymer size (ex: 28mer)
+def size(df):
+    original = int(input('Please enter the template size: '))
+    df["Size"] = df["Peak Number"].astype(int) + (original - 1)
+    return df
+
 def main():
     name = input('Enter file name (.txt): ')
     filtered = filtered_data(name)
     int_std_dist = sample_distance(filtered)
+    polymer = size(int_std_dist)
     print('Here is the Data:')
     print('--------------------------------------------------------')
-    print(int_std_dist)
+    print(polymer)
+    #print(int_std_dist)
+
 
 main()
