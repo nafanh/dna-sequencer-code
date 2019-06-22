@@ -138,6 +138,9 @@ def conc_fix(df):
     for head in headers:
         if '/Total' in head:
             df.loc[:,head] = df.loc[:,head] * conc
+    df = df.fillna(0)
+    df.sort_index(inplace=True)
+    export = df.to_csv('Export_data_filtered.csv',sep=',')
     return df
 def main():
     name = input('Enter file name (.txt): ')
