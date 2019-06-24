@@ -42,25 +42,27 @@ def filtered_data(name):
     # pprint.pprint(col_data)
     df = pd.DataFrame(col_data, columns=headers)
 
-    # filters height above user input
+    # filters height above user input. Note that if filter height
+    # is above internal standard height, then error will raise
+    # have to add try/except block here for future use
     min_height = int(input("Please enter the minimum height: "))
-    df_h100 = df.loc[df['Height'].astype(int) > min_height]
+    df_hmin = df.loc[df['Height'].astype(int) > min_height]
 
     # exports data with height above 100 to excel sheet
-    export_excel_filtered = df.to_csv('Export_data_filtered_H100.csv',sep=',')
+    #export_excel_filtered = df.to_csv('Export_data_filtered_Hmin.csv',sep=',')
     f.close()
-    return df_h100
+    return df_hmin
 
 
 def sample_distance(filtered_data):
     # gets peaks without internal standard
     df_no_int = filtered_data.loc[filtered_data['Dye'] == 'B']
-    # print(df_no_int)
+    #print(df_no_int)
 
     # gets peaks with internal standard
     df_int_std = filtered_data.loc[filtered_data['Dye'] == 'Y']
     #Exports the internal standard data
-    export_int_std = df_int_std.to_csv('Export_data_int_std.csv',sep = ',')
+    # export_int_std = df_int_std.to_csv('Export_data_int_std.csv',sep = ',')
     # print(df_int_std)
 
     # makes list of int standard data points
@@ -79,6 +81,8 @@ def sample_distance(filtered_data):
     int_std_dict = dict(zip(int_stdtimelist, int_stdlist))
     sample_2d = [list(a) for a in zip(sample_timelist, sample_list)]
 
+    #pprint.pprint(sample_2d)
+    
     # if sample_2d[i][0] in int_std_dict:
     diff_list = []
     for i in range(len(sample_2d)):
@@ -86,12 +90,11 @@ def sample_distance(filtered_data):
         diff_list.append(diff)
 
     df_no_int['Diff'] = diff_list
-    return (df_no_int)
 
     # exports data with compared to internal standard
-    export_excel_difference = df.to_csv('Export_data_intstd_Diff.csv',sep=',')
-
-
+    #export_excel_difference = df.to_csv('Export_data_intstd_Diff.csv',sep=',')
+    
+    return (df_no_int)
 # Function that outputs the polymer size (ex: 28mer)
 # and places it into a new column
 # ****Have to edit to where the template size is in relation to difference***
@@ -99,8 +102,42 @@ def size(df):
     #Asks user input for template size
     original = int(input('Please enter the template size: '))
     #Adjusts the peak number in relation to template size
-    #more = input("Please enter the 
-    df["Size"] = df["Peak Number"].astype(int) + (original - 1)
+    length = []
+    ranges_list = []
+    print("Please enter the diff bounds for each polymer. Ex: 27mer/300-400")
+    addit = 'y'
+    while addit == 'y' or addit == 'Y':
+        temp = []
+        polymer = input("Enter polymer (ex:27mer): ")
+        length.append(polymer)
+        low_r = int(input("Enter lower bound of diff: "))
+        upper_r = int(input("Enter upper bound of diff: "))
+        temp.append(low_r)
+        temp.append(upper_r)
+        ranges_list.append(temp)
+        addit = input("Are there any more? Input 'y' for yes and 'n' to end")
+    ranges_dict = {}
+    for i in range(len(ranges_list)):
+        ranges_dict[length[i]] = ranges_list[i]
+    #print(ranges_dict)
+
+    diff_list = df['Diff'].astype(int).tolist()
+    ranges_keys = list(ranges_dict.keys())
+    #print(ranges_keys)
+    final_length_list = []
+    #print(diff_list)
+    for j in diff_list:
+        for i in range(len(ranges_keys)):
+            width = ranges_dict[ranges_keys[i]]
+            #print(ranges_dict[ranges_keys[i]])
+            low = width[0]
+            high = width[-1]
+            if j >= low and j <= high:
+                final_length_list.append(ranges_keys[i])
+               
+    #print(final_length_list)
+            
+    df["Size"] = final_length_list
     return df
 
 # Function that creates the table containing area values for each polymer
@@ -186,23 +223,24 @@ def main():
     name = input('Enter file name (.txt): ')
     filtered = filtered_data(name)
     int_std_dist = sample_distance(filtered)
+    print(int_std_dist)
     polymer = size(int_std_dist)
-    print('Here is the Data (Filters out heights below threshold. Note no internal std):')
-    print('--------------------------------------------------------')
+##    print('Here is the Data (Filters out heights below threshold. Note no internal std):')
+##    print('--------------------------------------------------------')
     print(polymer)
-    print()
-    a = table(polymer)
-    print('Here is the data (Before concentration fix):')
-    print('--------------------------------------------------------')
-    
-    print(a)
-    print()
-    # print(int_std_dist)
-    fix = conc_fix(a)
-    print()
-    print('Here is the updated table data (after concentration fix):')
-    print('--------------------------------------------------------')
-    print(fix)
+##    print()
+##    a = table(polymer)
+##    print('Here is the data (Before concentration fix):')
+##    print('--------------------------------------------------------')
+##    
+##    print(a)
+##    print()
+##    # print(int_std_dist)
+##    fix = conc_fix(a)
+##    print()
+##    print('Here is the updated table data (after concentration fix):')
+##    print('--------------------------------------------------------')
+##    print(fix)
 
 
 main()
