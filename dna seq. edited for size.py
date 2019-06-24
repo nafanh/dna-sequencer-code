@@ -100,7 +100,7 @@ def sample_distance(filtered_data):
 # ****Have to edit to where the template size is in relation to difference***
 def size(df):
     #Asks user input for template size
-    original = int(input('Please enter the template size: '))
+    #original = int(input('Please enter the template size: '))
     #Adjusts the peak number in relation to template size
     length = []
     ranges_list = []
@@ -110,12 +110,19 @@ def size(df):
         temp = []
         polymer = input("Enter polymer (ex:27mer): ")
         length.append(polymer)
-        low_r = int(input("Enter lower bound of diff: "))
-        upper_r = int(input("Enter upper bound of diff: "))
-        temp.append(low_r)
-        temp.append(upper_r)
-        ranges_list.append(temp)
-        addit = input("Are there any more? Input 'y' for yes and 'n' to end: ")
+        try:
+
+
+        
+            low_r = int(input("Enter lower bound of diff: "))          
+            upper_r = int(input("Enter upper bound of diff: "))
+            temp.append(low_r)
+            temp.append(upper_r)
+            ranges_list.append(temp)
+            addit = input("Are there any more? Input 'y' for yes and 'n' to end: ")
+        except ValueError:
+            print("Not valid number please try again")
+        
     ranges_dict = {}
     for i in range(len(ranges_list)):
         ranges_dict[length[i]] = ranges_list[i]
