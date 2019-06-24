@@ -21,10 +21,15 @@ def filtered_data(name):
         test_set.pop(1)
         # print(test_set)
         # print(test_set)
+        
+        #inserts time into test_set
         test_set.insert(2, desc_fix[2])
+
+        #inserts Well number at the end of test_set
         test_set.insert(3, desc_fix[len(desc_fix) - 1])
         # print(test_set)
-        # splits dye and peak number
+        
+        # splits dye and peak number and puts them into separate columns
         dye_peak = test_set[0].strip('\"').replace(',', '')
         test_set.pop(0)
         i = 0
@@ -41,19 +46,20 @@ def filtered_data(name):
     df_h100 = df.loc[df['Height'].astype(int) > 100]
 
     # exports data with height above 100 to excel sheet
-    # export_excel_filtered = df.to_csv('Export_data_filtered.csv',sep=',')
-
+    export_excel_filtered = df.to_csv('Export_data_filtered_H100.csv',sep=',')
+    f.close()
     return df_h100
 
 
 def sample_distance(filtered_data):
     # gets peaks without internal standard
     df_no_int = filtered_data.loc[filtered_data['Dye'] == 'B']
-
     # print(df_no_int)
 
     # gets peaks with internal standard
     df_int_std = filtered_data.loc[filtered_data['Dye'] == 'Y']
+    #Exports the internal standard data
+    export_int_std = df_int_std.to_csv('Export_data_int_std.csv',sep = ',')
     # print(df_int_std)
 
     # makes list of int standard data points
@@ -82,20 +88,28 @@ def sample_distance(filtered_data):
     return (df_no_int)
 
     # exports data with compared to internal standard
-    # export_excel_difference = df.to_csv('Export_data_difference.csv',sep=',')
+    export_excel_difference = df.to_csv('Export_data_intstd_Diff.csv',sep=',')
 
 
-# Outputs the polymer size (ex: 28mer)
+# Function that outputs the polymer size (ex: 28mer)
+# and places it into a new column
 def size(df):
+    #Asks user input for template size
     original = int(input('Please enter the template size: '))
+    #Adjusts the peak number in relation to template size
     df["Size"] = df["Peak Number"].astype(int) + (original - 1)
     return df
 
+# Function that creates the table containing area values for each polymer
 def table(df):
+    #Creates sorted set with time values (unique values only)
     df_time = list(set(df['Time'].tolist()))
     df_time.sort()
+
+    #Creates sorted set with size values (unique values only)
     df_size = list(set(df['Size'].tolist()))
     df_size.sort()
+    
     #n = pd.DataFrame(columns = df_size)
     # headings = df_size
     # headings.append('Total')
@@ -109,51 +123,82 @@ def table(df):
     area_list = df['Area'].tolist()
     time_list = df['Time'].astype(float).tolist()
     # time_dict = {'time':time_list}
+
+    #Creates dictionary where time and size are keys. Value is area
     size_list = df['Size'].tolist()
+
+    #Creates tuple of time,size pairs
     two_keys = list(zip(time_list,size_list))
+    
     new_dict = {}
+
+    #Creates new empty dataframe with time values as index
     n = pd.DataFrame()
     n.index.name = 'Time'
+
+    #Appends area to dictionary containing the time and size keys
     for i in range(len(two_keys)):
         new_dict[two_keys[i]] = area_list[i]
 
+    #Parses the dictionary and creates a new column in the table
+    #for area
     for key in two_keys:
         time = key[0]
         size = str(key[1]) + 'mer'
         n.loc[time,size] = int(new_dict[key])
 
+    #Creates new columns containing the area of each polymer/total
     n['Total'] = n.sum(axis=1)
     headers_list = n.columns.values.tolist()
     for i in range(len(headers_list)-1):
         divide_name = headers_list[i] + '/' + headers_list[-1]
         n[divide_name] = n.iloc[:,i] / n.iloc[:,len(headers_list)-1]
 
+    #Sorts table by time and fill 'NaN' values with '0'
+    n.sort_index(inplace=True)
+    n = n.fillna(0)
 
-
+    #Exports non-concentration fixed data
+    export_before_conc = n.to_csv('Export_data_Before_concfix.csv',sep=',')
     return n
 
+#Function that multiplies values by specific concentration
 def conc_fix(df):
-    conc = int(input("Please enter the concentration: "))
+    conc = int(input("Please enter the concentration(nM): "))
+
+    #Creates new columns containing polymer/total multiplied by concentration
     headers = df.columns.values.tolist()
     for head in headers:
         if '/Total' in head:
             df.loc[:,head] = df.loc[:,head] * conc
     df = df.fillna(0)
     df.sort_index(inplace=True)
-    export = df.to_csv('Export_data_filtered.csv',sep=',')
+
+    #Exports the data to excel sheet
+    export = df.to_csv('Export_data_After_concfix.csv',sep=',')
     return df
+
+
 def main():
     name = input('Enter file name (.txt): ')
     filtered = filtered_data(name)
     int_std_dist = sample_distance(filtered)
     polymer = size(int_std_dist)
-    print('Here is the Data:')
+    print('Here is the Data (Filters out heights below threshold. Note no internal std):')
     print('--------------------------------------------------------')
     print(polymer)
+    print()
     a = table(polymer)
+    print('Here is the data (Before concentration fix):')
+    print('--------------------------------------------------------')
+    
     print(a)
+    print()
     # print(int_std_dist)
     fix = conc_fix(a)
+    print()
+    print('Here is the updated table data (after concentration fix):')
+    print('--------------------------------------------------------')
     print(fix)
 
 
