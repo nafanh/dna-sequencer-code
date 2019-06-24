@@ -115,7 +115,7 @@ def size(df):
         temp.append(low_r)
         temp.append(upper_r)
         ranges_list.append(temp)
-        addit = input("Are there any more? Input 'y' for yes and 'n' to end")
+        addit = input("Are there any more? Input 'y' for yes and 'n' to end: ")
     ranges_dict = {}
     for i in range(len(ranges_list)):
         ranges_dict[length[i]] = ranges_list[i]
@@ -149,7 +149,7 @@ def table(df):
     #Creates sorted set with size values (unique values only)
     df_size = list(set(df['Size'].tolist()))
     df_size.sort()
-    
+    #print(df_size)
     #n = pd.DataFrame(columns = df_size)
     # headings = df_size
     # headings.append('Total')
@@ -166,9 +166,10 @@ def table(df):
 
     #Creates dictionary where time and size are keys. Value is area
     size_list = df['Size'].tolist()
-
+    
     #Creates tuple of time,size pairs
     two_keys = list(zip(time_list,size_list))
+    #print(two_keys)
     
     new_dict = {}
 
@@ -176,6 +177,9 @@ def table(df):
     n = pd.DataFrame()
     n.index.name = 'Time'
 
+    for size in df_size:
+        n[size] = ""
+    #print(n)
     #Appends area to dictionary containing the time and size keys
     for i in range(len(two_keys)):
         new_dict[two_keys[i]] = area_list[i]
@@ -184,9 +188,10 @@ def table(df):
     #for area
     for key in two_keys:
         time = key[0]
-        size = str(key[1]) + 'mer'
+        size = key[1] 
         n.loc[time,size] = int(new_dict[key])
 
+    #print(new_dict)
     #Creates new columns containing the area of each polymer/total
     n['Total'] = n.sum(axis=1)
     headers_list = n.columns.values.tolist()
@@ -225,22 +230,22 @@ def main():
     int_std_dist = sample_distance(filtered)
     print(int_std_dist)
     polymer = size(int_std_dist)
-##    print('Here is the Data (Filters out heights below threshold. Note no internal std):')
-##    print('--------------------------------------------------------')
+    print('Here is the Data (Filters out heights below threshold. Note no internal std):')
+    print('--------------------------------------------------------')
     print(polymer)
-##    print()
-##    a = table(polymer)
-##    print('Here is the data (Before concentration fix):')
-##    print('--------------------------------------------------------')
-##    
-##    print(a)
-##    print()
-##    # print(int_std_dist)
-##    fix = conc_fix(a)
-##    print()
-##    print('Here is the updated table data (after concentration fix):')
-##    print('--------------------------------------------------------')
-##    print(fix)
+    print()
+    a = table(polymer)
+    print('Here is the data (Before concentration fix):')
+    print('--------------------------------------------------------')
+    
+    print(a)
+    print()
+    # print(int_std_dist)
+    fix = conc_fix(a)
+    print()
+    print('Here is the updated table data (after concentration fix):')
+    print('--------------------------------------------------------')
+    print(fix)
 
 
 main()
