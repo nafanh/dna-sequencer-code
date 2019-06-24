@@ -16,10 +16,10 @@ def filtered_data(name):
         test_set = test.split()
         # strips the underscore in long description
         desc_fix = test_set[1].split('_')
-        # print(desc_fix)
+        #print(desc_fix)
         # removes long description name
         test_set.pop(1)
-        # print(test_set)
+        #print(test_set)
         # print(test_set)
         
         #inserts time into test_set
