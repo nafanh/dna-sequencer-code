@@ -75,6 +75,8 @@ def frac(prod_list,df):
 def frac_conc_fix(frac):
     conc = int(input("Please enter concentration(nM): "))
     a = [x * conc for x in frac]
+    a[0] = 0
+    
     return a
 
 def time_addition(frac_conc):
@@ -87,7 +89,7 @@ def time_addition(frac_conc):
         cont = input("Are there any more time points? Enter 'y' for yes or 'n' for no: ")
     df = pd.DataFrame(time_pts,columns = ['Time'])
     df['Product'] = frac_conc
-    export_data = df.to_csv('Exported_data.csv',sep=',')
+    #export_data = df.to_csv('Exported_data.csv',sep=',')
     return df
 def main():
 ##    file_name = input("Enter file name (.txt format): ")
