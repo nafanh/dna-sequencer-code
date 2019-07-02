@@ -3,7 +3,7 @@ import numpy as np
 import re
 import pprint
 import matplotlib.pyplot as plt
-
+import math
 #Gets a number from string and sorts it into a list
 def atoi(text):
     return int(text) if text.isdigit() else text
@@ -137,18 +137,17 @@ def size(df):
         temp = []
         polymer = input("Enter polymer (ex:27mer): ")
         length.append(polymer)
-        try:
-
-
-        
-            low_r = int(input("Enter lower bound of diff: "))          
-            upper_r = int(input("Enter upper bound of diff: "))
-            temp.append(low_r)
-            temp.append(upper_r)
-            ranges_list.append(temp)
-            addit = input("Are there any more? Input 'y' for yes and 'n' to end: ")
-        except ValueError:
-            print("Not valid number please try again")
+        while True:
+            try:
+                low_r = int(input("Enter lower bound of diff: "))          
+                upper_r = int(input("Enter upper bound of diff: "))
+                temp.append(low_r)
+                temp.append(upper_r)
+                ranges_list.append(temp)
+                break
+            except ValueError:
+                print("Lower and upper bounds not valid. Please try again.")
+        addit = input("Are there any more? Input 'y' for yes and 'n' to end: ")
     
     #ranges_list2 = sorted(ranges_list, key=lambda x: int("".join([i for i in x if i.isdigit()])))
     
@@ -295,15 +294,38 @@ def conc_fix(df):
 
 # Makes plots of the fractional area vs size
 def plot(time,size,frac):
-    f,axarr = plt.subplots(len(frac)//2 ,2,sharex=True,sharey=True)
-    f.suptitle('Fractional Area vs. Size')
-    count = 0
-    for i in range(2):
-        for j in range(len(time)//2):
-            axarr[j,i].bar(size,frac[count],width=0.1)
-            axarr[j,i].set_title('Time: ' + str(time[count]),loc='right',fontsize=8)
+    half = math.ceil(len(frac)/2)
+    if half % 2 == 1:
+            
+        f,axarr = plt.subplots(math.ceil(len(frac)/2),2,sharex=True,sharey=True)
+        f.suptitle('Fractional Area vs. Size')
+        count = 0
+        for i in range(2):
+            for j in range(math.ceil(len(frac)/2)):
+                if count == len(time):
+                    break
+                axarr[j,i].bar(size,frac[count],width=0.1)
+                axarr[j,i].set_title('Time: ' + str(time[count]),loc='right',fontsize=8)
             #print(count)
-            count+=1
+                
+                count+=1
+    
+    # Fix if odd number of time points
+##    if count < len(frac):
+    else:
+        f,axarr = plt.subplots(len(frac)//2 ,2,sharex=True,sharey=True)
+        f.suptitle('Fractional Area vs. Size')
+        count_even = 0
+        for i in range(2):
+            for j in range(len(time)//2):
+                axarr[j,i].bar(size,frac[count_even],width=0.1)
+                axarr[j,i].set_title('Time: ' + str(time[count_even]),loc='right',fontsize=8)
+                #print(count)
+                count_even+=1
+    
+    # Fix if odd number of time points
+##    if count < len(frac):
+        
     f.text(0.04,0.5,'Fractional Area', va='center', rotation='vertical')
     plt.subplots_adjust(hspace=0.4)
     plt.xticks(np.arange(len(size)),size)
@@ -338,17 +360,19 @@ def main():
     length = get_size_values(polymer)
     frac = get_frac_values(a)
    
-    plot(time,length,frac)
+    
     
 ##    print(get_frac_values(a))
 ##    print(a.index.values.tolist())
-##    print()
-##    # print(int_std_dist)
-##    fix = conc_fix(a)
-##    print()
-##    print('Here is the updated table data (after concentration fix):')
-##    print('--------------------------------------------------------')
-##    print(fix)
+    print()
+    # print(int_std_dist)
+    fix = conc_fix(a)
+    print()
+    print('Here is the updated table data (after concentration fix):')
+    print('--------------------------------------------------------')
+    print(fix)
+
+    plot(time,length,frac)
 
 
 main()
