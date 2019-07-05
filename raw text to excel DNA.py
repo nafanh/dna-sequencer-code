@@ -5,13 +5,15 @@ import pprint
 import matplotlib.pyplot as plt
 import math
 #Gets a number from string and sorts it into a list
+#Two functions used for sorting the length of the polymers into columns
 def atoi(text):
     return int(text) if text.isdigit() else text
 
 def natural_keys(text):
     return [atoi(c) for c in re.split(r'(\d+)',text)]
 
-
+#Removes the SettingCopyerror
+#pd.options.mode.chained_assignment = None 
 
 #Entered name has to be in this format:
 # Any_Any_[Time]_Any(even amt of underscores)_[Well](.fsa)
@@ -63,6 +65,7 @@ def filtered_data(name):
     # filters height above user input. Note that if filter height
     # is above internal standard height, then error will raise
     # have to add try/except block here for future use
+  
     min_height = int(input("Please enter the minimum height: "))
     df_hmin = df.loc[df['Height'].astype(int) > min_height]
 
@@ -108,12 +111,13 @@ def sample_distance(filtered_data):
         diff = int(int_std_dict[sample_2d[i][0]]) - int(sample_2d[i][1])
         diff_list.append(diff)
 
-    df_no_int['Diff'] = diff_list
+    df_diff = df_no_int.copy()
+    df_diff['Diff'] = diff_list
 
     # exports data with compared to internal standard
     #export_excel_difference = df.to_csv('Export_data_intstd_Diff.csv',sep=',')
     
-    return (df_no_int)
+    return (df_diff)
 
 # Returns pandas series with list of unique ranges (distance from int. std.)
 def diff_list(df):
@@ -146,7 +150,7 @@ def size(df):
                 ranges_list.append(temp)
                 break
             except ValueError:
-                print("Lower and upper bounds not valid. Please try again.")
+                print("Lower or upper bounds not valid. Please try again.")
         addit = input("Are there any more? Input 'y' for yes and 'n' to end: ")
     
     #ranges_list2 = sorted(ranges_list, key=lambda x: int("".join([i for i in x if i.isdigit()])))
@@ -175,8 +179,6 @@ def size(df):
             
     df["Size"] = final_length_list
 
-
-    
     return df
 
 
@@ -260,9 +262,6 @@ def table(df):
 def get_size_values(df):
     df1 = list(set(df['Size'].tolist()))
     return df1
-##    length_list = list(set(df["Size"].tolist()))
-##    length_list = sorted(length_list, key=lambda x: int("".join([i for i in x if i.isdigit()])))
-#return length_list
 
 # Gets the values 
 def get_frac_values(df):
@@ -311,7 +310,6 @@ def plot(time,size,frac):
                 count+=1
     
     # Fix if odd number of time points
-##    if count < len(frac):
     else:
         f,axarr = plt.subplots(len(frac)//2 ,2,sharex=True,sharey=True)
         f.suptitle('Fractional Area vs. Size')
@@ -322,9 +320,7 @@ def plot(time,size,frac):
                 axarr[j,i].set_title('Time: ' + str(time[count_even]),loc='right',fontsize=8)
                 #print(count)
                 count_even+=1
-    
-    # Fix if odd number of time points
-##    if count < len(frac):
+
         
     f.text(0.04,0.5,'Fractional Area', va='center', rotation='vertical')
     plt.subplots_adjust(hspace=0.4)
@@ -333,8 +329,7 @@ def plot(time,size,frac):
     #plt.ylabel('Fractional Area',labelpad=20)
     plt.show()
     
-# Takes lits from get_frac_values and get_x_values
-##def make_graphs(frac,size,time)
+    
 def main():
     name = input('Enter file name (.txt): ')
     filtered = filtered_data(name) #Creates table filtered by height threshold
@@ -342,37 +337,47 @@ def main():
     #Adds column to table for distance to int. std.
     int_std_dist = sample_distance(filtered)
 
-    #Returns a pandas series of difference ranges
+    #Returns a pandas series of difference ranges\
+    print('Here are the difference ranges between peak and internal standard: ')
     print(diff_list(int_std_dist))
     print(int_std_dist)
+
+    #Creates a dataframe that filters out the internal standards and any peaks below certain threshold height
     polymer = size(int_std_dist)
     print('Here is the Data (Filters out heights below threshold. Note no internal std):')
     print('--------------------------------------------------------')
     print(polymer)
     #get_size_values(polymer)
     print()
+
+    #Creates a dataframe the has the fractional area of each polymer before conc. fix
     a = table(polymer)
     print('Here is the data (Before concentration fix):')
     print('--------------------------------------------------------')
-    
     print(a)
+
+    #Gets the time, length, and fractional area into lists
     time = get_time_values(a)
     length = get_size_values(polymer)
     frac = get_frac_values(a)
    
-    
-    
-##    print(get_frac_values(a))
-##    print(a.index.values.tolist())
+    ##print(get_frac_values(a))
+    ##print(a.index.values.tolist())
     print()
     # print(int_std_dist)
+
+    #Creates a dataframe that updates fracitonal area for concentration
     fix = conc_fix(a)
     print()
     print('Here is the updated table data (after concentration fix):')
     print('--------------------------------------------------------')
     print(fix)
 
+    #Plots the size, fractional area, and length using matplotlib
+    #Returns a bar graph with time as the label
     plot(time,length,frac)
 
 
-main()
+
+
+
