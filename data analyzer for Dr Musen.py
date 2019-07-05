@@ -19,7 +19,10 @@ def table(file_name):
     df = pd.read_csv(file_name, delimiter='\t')
     min_area = int(input("Please enter the minimum area: "))
     df_areamin = df.loc[df['Area'].astype(int)> min_area]
-    print(df_areamin)
+##    min_height = int(input("Please enter the minimum height: "))
+##    df_heightmin = df.loc[df['Height'].astype(int)> min_height]
+##    print(df_heightmin)
+##    return df_heightmin
     return df_areamin
 
 #
@@ -44,6 +47,28 @@ def last_two(b):
     c.append(b[len(b)-2][0])
     c.append(b[-1][0])
     return(c)
+#Tries with height instead of area
+def parse_peak_num_h(df):
+    a = df['Num'].values.astype(int).tolist()
+    idx = df.index.values.astype(int).tolist()
+    #print(idx)
+    coor = list(zip(idx,a))
+    print(coor)
+   # b = [int(x) for x in a]
+    c = last_two(coor)
+    print(c)
+    range_list = []
+    df['First'] = np.nan
+    df['Second'] = np.nan
+
+    area_list = [df.loc[idx,'Area'] for idx in c]
+    print(area_list)
+    #List c has all the indexes
+    for i in range(0,len(c)-1,2):
+        df.at[c[i],'First'] = area_list[i]
+        df.at[c[i+1],'Second'] = area_list[i+1]
+        
+    return df
 #Takes the last two peaks as the template and product
 def parse_peak_num(df):
     a = df['Num'].values.astype(int).tolist()
