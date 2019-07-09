@@ -377,8 +377,7 @@ def main():
     #Returns a bar graph with time as the label
     plot(time,length,frac)
 
-if __name__ == '__main__':
-    main()
+
 
 
 
