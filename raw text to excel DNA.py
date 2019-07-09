@@ -255,7 +255,7 @@ def table(df):
     n = n.fillna(0)
 
     #Exports non-concentration fixed data
-    export_before_conc = n.to_csv('Export_data_Before_concfix.csv',sep=',')
+    #export_before_conc = n.to_csv('Export_data_Before_concfix.csv',sep=',')
     return n
 
 # Returns a set list for x labels (size)
@@ -288,7 +288,7 @@ def conc_fix(df):
     df.sort_index(inplace=True)
 
     #Exports the data to excel sheet
-    export = df.to_csv('Export_data_After_concfix.csv',sep=',')
+    #export = df.to_csv('Export_data_After_concfix.csv',sep=',')
     return df
 
 # Makes plots of the fractional area vs size
