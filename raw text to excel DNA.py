@@ -179,6 +179,11 @@ def size(df):
         #Resets everytime the loop is run
         temp = []
         polymer = input("Enter polymer (ex:27mer): ")
+        while True:
+            if 'mer' not in polymer:
+                polymer = input("Invalid polymer name, please try again: ")
+            else:
+                break
         length.append(polymer)
         while True:
             try:
@@ -377,6 +382,8 @@ def plot(time,size,frac):
                 axarr[j,i].bar(size,frac[count],width=0.1)
                 #Puts time in the upper right corner
                 axarr[j,i].set_title('Time: ' + str(time[count]),loc='right',fontsize=8)
+                axarr[j,i].set_yticks([0,1])
+                
             #print(count)
                 
                 count+=1
@@ -392,7 +399,8 @@ def plot(time,size,frac):
                 axarr[j,i].set_title('Time: ' + str(time[count_even]),loc='right',fontsize=8)
                 #print(count)
                 count_even+=1
-
+                
+   
     #Labels the figure 
     f.text(0.04,0.5,'Fractional Area', va='center', rotation='vertical')
     plt.subplots_adjust(hspace=0.4)
