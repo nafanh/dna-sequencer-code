@@ -18,33 +18,46 @@ def natural_keys(text):
 #Entered name has to be in this format:
 # Any_Any_[Time]_Any(even amt of underscores)_[Well](.fsa)
 #ex: Exo_BurstMM_0.5_TLD_2018-12-18_A06.fsa
+#Ex: PT_100nM_0_TLD_4.2.19_1_2019-04-02_A05.fsa
 def filtered_data(name):
     # file_name = 'Burst on PThio DNA.txt'
     f = open(name, 'r')
     headers = ['Dye', 'Peak Number', 'Height', 'Time', 'Well', 'Area', 'Data Point']
     # data = pd.read_csv('Burst on PThio DNA.txt')
-    f.readline()
+    f.readline() 
     col_data = []
     count = 0
     # reads each line in the text file
     for test in f:
         #Splits column data based on header
         # Dye/Sample Peak,Sample File Name,Size, Height, Area,Data Point
+        
         test_set = test.split()
+        #Output: ['"B,1"', 'PT_100nM_0_TLD_4.2.19_1_2019-04-02_A05.fsa', '894', '11056', '2524'] 
+
+
         #print(test_set)
         # strips the underscore in long description
         desc_fix = test_set[1].split('_')
+        # Output: ['PT', '100nM', '0', 'TLD', '4.2.19', '1', '2019-04-02', 'A05.fsa']
+        
         #print(desc_fix)
         # removes long description name
         test_set.pop(1)
+        #Output: ['"B,1"','894', '11056', '2524'] 
         #print(test_set)
         #print(test_set)
         
         #inserts time into test_set
         test_set.insert(2, desc_fix[2])
 
+        #Output:['"B,1"', 'PT_100nM_0_TLD_4.2.19_1_2019-04-02_A05.fsa', '0', '894', '11056', '2524']
+
         #inserts Well number at the end of test_set
         test_set.insert(3, desc_fix[len(desc_fix) - 1])
+        
+        #Output: #['"B,1"', 'PT_100nM_0_TLD_4.2.19_1_2019-04-02_A05.fsa', '0', 'A05.fsa', '894', '11056', '2524']
+        
         #print(test_set)
         
         # splits dye and peak number and puts them into separate columns
@@ -84,7 +97,7 @@ def sample_distance(filtered_data):
     df_int_std = filtered_data.loc[filtered_data['Dye'] == 'Y']
    
     #Exports the internal standard data
-    export_int_std = df_int_std.to_csv('Export_data_int_std.csv',sep = ',')
+    #export_int_std = df_int_std.to_csv('Export_data_int_std.csv',sep = ',')
     # print(df_int_std)
 
     # makes list of int standard data points
@@ -100,23 +113,38 @@ def sample_distance(filtered_data):
     sample_timelist = df_no_int['Time'].tolist()
     # print(sample_timelist)
 
+    #zips the internal standard time points and data points into a dictionary
+    # Ex: {1:2,3:4}
     int_std_dict = dict(zip(int_stdtimelist, int_stdlist))
+
+    #zips the sample time points and data points into a nested list
+    # Ex: [[1,2],[3,4]]
     sample_2d = [list(a) for a in zip(sample_timelist, sample_list)]
 
     #pprint.pprint(sample_2d)
     
     # if sample_2d[i][0] in int_std_dict:
+
+    #Creates a column in the pandas dataframe for difference
+    #(internal standard - sample) by using datapoint
+    #For each time
     diff_list = []
     for i in range(len(sample_2d)):
+        #Subtracts the internal std value by the sample datapoint
+        #Method is inefficient, could probably use nested list
+        # for the internal standards as well
         diff = int(int_std_dict[sample_2d[i][0]]) - int(sample_2d[i][1])
         diff_list.append(diff)
 
+    #This is to prevent pandas SettingwithCopyWarning
     df_diff = df_no_int.copy()
     df_diff['Diff'] = diff_list
 
     # exports data with compared to internal standard
     #export_excel_difference = df.to_csv('Export_data_intstd_Diff.csv',sep=',')
-    
+
+    #Returns a dataframe containing values with differences and
+    #No intenal standard column
     return (df_diff)
 
 # Returns pandas series with list of unique ranges (distance from int. std.)
@@ -133,11 +161,22 @@ def size(df):
     #Asks user input for template size
     #original = int(input('Please enter the template size: '))
     #Adjusts the peak number in relation to template size
+
+    #Polymer length list. Ex: [27mer,28mer,29mer]
     length = []
+
+    #Nested list for the ranges of the difference ranges for each polymer. 
+    #Ex: For 27mer: [[300,400]]. Where 300 is lower bound and 400 is upper bound
     ranges_list = []
+
+    #Prompts user for difference bounds for each polymer
     print("Please enter the diff bounds for each polymer. Ex: 27mer/300-400")
     addit = 'y'
+
+    #Loop for multiple polymers
     while addit == 'y' or addit == 'Y':
+        #Creates temporary list to be added to the ranges_list
+        #Resets everytime the loop is run
         temp = []
         polymer = input("Enter polymer (ex:27mer): ")
         length.append(polymer)
@@ -147,36 +186,55 @@ def size(df):
                 upper_r = int(input("Enter upper bound of diff: "))
                 temp.append(low_r)
                 temp.append(upper_r)
+                #Adds nested list of lower and upper bounds to list
                 ranges_list.append(temp)
                 break
-            except ValueError:
+
+            #In case integer not entered for bounds. Catch exception
+            except ValueError: 
                 print("Lower or upper bounds not valid. Please try again.")
         addit = input("Are there any more? Input 'y' for yes and 'n' to end: ")
     
     #ranges_list2 = sorted(ranges_list, key=lambda x: int("".join([i for i in x if i.isdigit()])))
     
-        
+    #Creates a dictionary for polymer length and difference ranges
+    #Ex: {27mer:[300,400],28mer"[450,500]}
     ranges_dict = {}
+
+    #Loop appends each polymer as the key and the range list as the value
     for i in range(len(ranges_list)):
         ranges_dict[length[i]] = ranges_list[i]
     #print(ranges_dict)
 
+    #Takes difference values to list
     diff_list = df['Diff'].astype(int).tolist()
+
+    #Gets the keys of the dictionary which are the polymer sizes
     ranges_keys = list(ranges_dict.keys())
     #print(ranges_keys)
     final_length_list = []
     #print(diff_list)
+
+    #Parses the differences (internal std - sample) and checks to see
+    #If within a certain range. If it is, then it is appends the key(size)
+    #to final_length_list
     for j in diff_list:
         for i in range(len(ranges_keys)):
+            #Gets the value of ranges. Ex: [300,400]
             width = ranges_dict[ranges_keys[i]]
             #print(ranges_dict[ranges_keys[i]])
+
+            #Takes lower bound
             low = width[0]
+            #Takes upper bound
             high = width[-1]
+            #If the difference is in between these bounds, then
+            #append the size to the final_length_list
             if j >= low and j <= high:
                 final_length_list.append(ranges_keys[i])
                
     #print(final_length_list)
-            
+    #Creates a new column in the dataframe for the size of each sample run
     df["Size"] = final_length_list
 
     return df
@@ -200,6 +258,7 @@ def table(df):
     #Creates sorted set with size values (unique values only)
     df_size = list(set(df['Size'].tolist()))
     df_size.sort(key=natural_keys)
+    
     #print(df_size)
     #n = pd.DataFrame(columns = df_size)
     # headings = df_size
@@ -219,6 +278,7 @@ def table(df):
     size_list = df['Size'].tolist()
     
     #Creates tuple of time,size pairs
+    #This tuple will eventually be the key values for the dictionary
     two_keys = list(zip(time_list,size_list))
     #print(two_keys)
     
@@ -232,17 +292,20 @@ def table(df):
         n[size] = ""
     #print(n)
     #Appends area to dictionary containing the time and size keys
+    #Ex: {(0.05 sec,27mer),34000, (0.10 sec, 27mer), 20000}
     for i in range(len(two_keys)):
         new_dict[two_keys[i]] = area_list[i]
 
     #Parses the dictionary and creates a new column in the table
-    #for area
+    #for area. Locates the time and size and inputs the area for that
+    #those values into the dataframe
     for key in two_keys:
         time = key[0]
         size = key[1] 
         n.loc[time,size] = int(new_dict[key])
 
     #print(new_dict)
+        
     #Creates new columns containing the area of each polymer/total
     n['Total'] = n.sum(axis=1)
     headers_list = n.columns.values.tolist()
@@ -254,7 +317,8 @@ def table(df):
     n.sort_index(inplace=True)
     n = n.fillna(0)
 
-    #Exports non-concentration fixed data
+    #Exports non-concentration fixed data. Gives the fractional area for
+    #Each polymer and the time points
     #export_before_conc = n.to_csv('Export_data_Before_concfix.csv',sep=',')
     return n
 
@@ -291,25 +355,33 @@ def conc_fix(df):
     #export = df.to_csv('Export_data_After_concfix.csv',sep=',')
     return df
 
-# Makes plots of the fractional area vs size
+
+#***Need to fixt this because matplotlib gives two columns. If you have
+#   an odd number of time points, it will give you an empty graph****
+# Makes bar graph plots of the fractional area vs size
+# Function accepts time,size, and fraction list
 def plot(time,size,frac):
     half = math.ceil(len(frac)/2)
+    #Conditional for odd number of time points
     if half % 2 == 1:
-            
+        #Creates a figure and adds subplots. Makes two columns
         f,axarr = plt.subplots(math.ceil(len(frac)/2),2,sharex=True,sharey=True)
         f.suptitle('Fractional Area vs. Size')
         count = 0
+        #Adds subplot to each column
         for i in range(2):
             for j in range(math.ceil(len(frac)/2)):
                 if count == len(time):
                     break
+                #Creates a bar graph subplot
                 axarr[j,i].bar(size,frac[count],width=0.1)
+                #Puts time in the upper right corner
                 axarr[j,i].set_title('Time: ' + str(time[count]),loc='right',fontsize=8)
             #print(count)
                 
                 count+=1
     
-    # Fix if odd number of time points
+    #If even number of time points execute else statement
     else:
         f,axarr = plt.subplots(len(frac)//2 ,2,sharex=True,sharey=True)
         f.suptitle('Fractional Area vs. Size')
@@ -321,9 +393,10 @@ def plot(time,size,frac):
                 #print(count)
                 count_even+=1
 
-        
+    #Labels the figure 
     f.text(0.04,0.5,'Fractional Area', va='center', rotation='vertical')
     plt.subplots_adjust(hspace=0.4)
+    #Labels the x-axis
     plt.xticks(np.arange(len(size)),size)
     plt.xlabel('Size')
     #plt.ylabel('Fractional Area',labelpad=20)
@@ -337,7 +410,7 @@ def main():
     #Adds column to table for distance to int. std.
     int_std_dist = sample_distance(filtered)
 
-    #Returns a pandas series of difference ranges\
+    #Returns a pandas series of difference ranges
     print('Here are the difference ranges between peak and internal standard: ')
     print(diff_list(int_std_dist))
     print(int_std_dist)
@@ -350,7 +423,7 @@ def main():
     #get_size_values(polymer)
     print()
 
-    #Creates a dataframe the has the fractional area of each polymer before conc. fix
+    #Creates a dataframe that has the fractional area of each polymer before conc. fix
     a = table(polymer)
     print('Here is the data (Before concentration fix):')
     print('--------------------------------------------------------')
@@ -377,7 +450,8 @@ def main():
     #Returns a bar graph with time as the label
     plot(time,length,frac)
 
-
+if __name__ == '__main__':
+    main()
 
 
 
