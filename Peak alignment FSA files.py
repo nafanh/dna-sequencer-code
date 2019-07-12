@@ -17,8 +17,14 @@ file.readline()
 #Gets the x value of the max value
 #trace['DATA1'].index(max(trace['DATA1']))
 
+
+fig,ax = plt.subplots(2,4,sharex=True,sharey=True)
+count = 1
 #Sets the data points of the first time point as the standard
 first_dp = file.readline().rstrip('\n')
+#Gets time point from description name
+first_dp_split = first_dp.split('_')
+time = first_dp_split[2]
 standard = SeqIO.read(first_dp,'abi')
 s_abif_key = standard.annotations['abif_raw'].keys()
 s_trace = defaultdict(list)
@@ -28,15 +34,30 @@ for sc in s_channels:
 #Gets the y value for peak of reference peak
 y_std_max = max(s_trace['DATA1'])
 x_std_max = s_trace['DATA1'].index(y_std_max)
-plt.plot(s_trace['DATA1'],color='black')
-plt.xlim(2500,2700)
-plt.show()
+##plt.plot(s_trace['DATA1'],color='black')
+##plt.xlim(2500,2700)
+##plt.show()
+ax[0,0].plot(s_trace['DATA1'],color='black')
+ax[0,0].set_title('Time: ' + time, loc='right',fontsize=8)
+ax[0,0].set_xlim(2550,2650)
+ax[0,0].set_ylim(0,5000)
 
+i = 0
+j = 1
 for line in file:
+    #Resets the row once gets to end of row limit
+    if j == 4:
+        i+=1
+        j = 0
     name = line.rstrip('\n')
     #Ends the loop if empty line
     if not name:
         break
+    #Gets the time for peaks
+    name_split = name.split('_')
+    time_peak = name_split[2]
+    print(name_split)
+    print(time_peak)
     #opens up the FSA file
     record = SeqIO.read(name,'abi')
     #Record returns a bunch of dictionaries. Use this line to get the dictionary
@@ -55,14 +76,25 @@ for line in file:
     x_peak = trace['DATA1'].index(y_peak)
     #Takes difference of reference x value and time point x value
     diff = x_peak - x_std_max 
-    print(diff)
+    #print(diff)
     #Gets x values for vectorization purposes
     array = np.arange(1,len(trace['DATA1'])+1)
     #Subtracts difference from array (vectorization)
     array -= diff
     #Plots the chromatogram data
-    plt.plot(array,trace['DATA1'],color='black')
-    plt.xlim(2500,2700)
-    plt.ylim(0,5000)
-    plt.show()
+##    for i in range(2):
+##        for j in range(4):
+##            if i == 0 and j == 0:
+##                continue
+    ax[i,j].plot(array,trace['DATA1'],color='black')
+    ax[i,j].set_title('Time: ' + time_peak, loc='right',fontsize=8)
+    ax[i,j].set_xlim(2550,2650)
+    ax[i,j].set_ylim(0,5000)
+    #Increments column for subplot
+    j+=1
+
+##    plt.plot(array,trace['DATA1'],color='black')
+##    plt.xlim(2500,2700)
+##    plt.ylim(0,5000)
+plt.show()
 file.close()
