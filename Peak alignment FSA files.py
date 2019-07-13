@@ -18,23 +18,30 @@ file.readline()
 #Gets the x value of the max value
 #trace['DATA1'].index(max(trace['DATA1']))
 
+#Prompts user for number of time points and the y/x min and max
 num_pts = int(input("Please enter number of time points: "))
 x_min = int(input("Please enter the min. x value: "))
 x_max = int(input("Please enter max x value: "))
 y_min = int(input("Please enter min y value: "))
 y_max = int(input("Please enter max y value: "))
 
+#Creates figure, axis objects for subplot
 fig,ax = plt.subplots(2,num_pts//2,sharex=True,sharey=True)
 count = 1
 #Sets the data points of the first time point as the standard
 first_dp = file.readline().rstrip('\n')
 #Gets time point from description name
+#Time point is always after the third underscore
 first_dp_split = first_dp.split('_')
 time = first_dp_split[2]
+#Reads in the standard peak
 standard = SeqIO.read(first_dp,'abi')
+#Gets the keys from annotations dictionary
 s_abif_key = standard.annotations['abif_raw'].keys()
+#Initializes empty list values for dictionary to prevent keyerror
 s_trace = defaultdict(list)
 s_channels = ['DATA1']
+#Adds raw chromatogram data to the dictionary
 for sc in s_channels:
     s_trace[sc] = standard.annotations['abif_raw'][sc]
 #Gets the y value for peak of reference peak
@@ -43,11 +50,13 @@ x_std_max = s_trace['DATA1'].index(y_std_max)
 ##plt.plot(s_trace['DATA1'],color='black')
 ##plt.xlim(2500,2700)
 ##plt.show()
+#Outputs the graph for the standard peaks
 ax[0,0].plot(s_trace['DATA1'],color='black')
 ax[0,0].set_title('Time: ' + time, loc='right',fontsize=8)
 ax[0,0].set_xlim(x_min,x_max)
 ax[0,0].set_ylim(y_min,y_max)
 
+#Initialize variables for row and column
 i = 0
 j = 1
 for line in file:
@@ -92,6 +101,7 @@ for line in file:
 ##        for j in range(4):
 ##            if i == 0 and j == 0:
 ##                continue
+    #Displays the peaks
     ax[i,j].plot(array,trace['DATA1'],color='black')
     ax[i,j].set_title('Time: ' + time_peak, loc='right',fontsize=8)
     ax[i,j].set_xlim(x_min,x_max)
