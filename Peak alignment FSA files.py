@@ -4,7 +4,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 #opens up text file containing the names of fsa scripts
-file = open(r'files2.txt','r')
+file_name = input("Please enter file name (.txt format) ex: DNA.txt: ")
+file = open(file_name,'r')
 file.readline()
 #Gets the x values
 #a = [x for x in range(len(trace['DATA1'])+1)]
