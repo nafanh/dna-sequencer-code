@@ -1,3 +1,5 @@
+#! python3
+
 import pandas as pd
 import numpy as np
 import re
@@ -330,6 +332,7 @@ def table(df):
 # Returns a set list for x labels (size)
 def get_size_values(df):
     df1 = list(set(df['Size'].tolist()))
+    df1.sort(key=natural_keys)
     return df1
 
 # Gets the values 
