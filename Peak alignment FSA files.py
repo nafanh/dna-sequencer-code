@@ -1,10 +1,30 @@
+#! python3
 from Bio import SeqIO
 from collections import defaultdict
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-#opens up text file containing the names of fsa scripts
-file_name = input("Please enter file name (.txt format) ex: DNA.txt: ")
+import os
+#In order to get file names of the fsa plots, go to run -->
+#cmd --> cd (place where file is contained)
+#Ex: cd downloads --> cd --> re --> dir/b >(desiredname.txt)
+#This converts the names into txt file into the folder with fsa files
+
+#In order to get the text file name from the folder
+
+folder_check = input("If your .fsa files are in a folder, press 'y' to continue, else press 'n': ")
+if folder_check == 'y' or folder_check == 'Y':
+    txt_name = ''
+    fsa_dir = input('Please enter the name of the folder with the .fsa files: ')
+    for f_name in os.listdir(fsa_dir + '/'):
+        if f_name.endswith('.txt'):
+            txt_name = f_name
+    file_name = txt_name
+else:
+    #opens up text file containing the names of fsa scripts
+    file_name = input("Please enter file name (.txt format) ex: DNA.txt. Please only use if your \
+.fsa files are in the scripts folder along with the .txt file containing \
+the names of the .fsa files: ")
 file = open(file_name,'r')
 file.readline()
 #Gets the x values
@@ -19,12 +39,33 @@ file.readline()
 #trace['DATA1'].index(max(trace['DATA1']))
 
 #Prompts user for number of time points and the y/x min and max
+
+#Checks how many fsa files are in the text file. If not equal to the number
+#of time points entered, then requests user to enter number of time points again
+count = 0
+for fsa_file in file:
+    fsa_file = fsa_file.rstrip('\n')
+    if fsa_file.endswith('.fsa'):
+        count += 1
 num_pts = int(input("Please enter number of time points: "))
+while count > num_pts or count < num_pts:
+    num_pts = int(input("Number of time points not consistent \
+with the number of .fsa files. Please enter number of time points again: "))
 x_min = int(input("Please enter the min. x value: "))
 x_max = int(input("Please enter max x value: "))
+while x_min > x_max:
+    x_min = int(input("x value minimum is greater than x value max, please try again. x min value: "))
+    x_max = int(input("Please enter max x value: "))
 y_min = int(input("Please enter min y value: "))
 y_max = int(input("Please enter max y value: "))
+while y_min > y_max:
+    y_min = int(input("y value minimum is greater than y value max, please try again. y min value: "))
+    y_max = int(input("Please enter max y value: "))
+file.close()
 
+#Opens file again because it already parsed through all lines the first time
+file = open(file_name,'r')
+file.readline()
 #Creates figure, axis objects for subplot
 fig,ax = plt.subplots(2,num_pts//2,sharex=True,sharey=True)
 count = 1
@@ -112,5 +153,8 @@ for line in file:
 ##    plt.plot(array,trace['DATA1'],color='black')
 #    plt.xlim(2000,3000)
 ##    plt.ylim(0,5000)
+fig.suptitle('Chromatogram Peaks')
+fig.text(0.04,0.5,'RFU', va='center', rotation='vertical')
+
 plt.show()
 file.close()
