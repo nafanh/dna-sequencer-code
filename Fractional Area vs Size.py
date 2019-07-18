@@ -6,6 +6,7 @@ import pprint
 import matplotlib.pyplot as plt
 import math
 import os
+from pathlib import Path
 #Gets a number from string and sorts it into a list
 #Two functions used for sorting the length of the polymers into columns
 def atoi(text):
@@ -359,8 +360,19 @@ def conc_fix(df):
     df = df.fillna(0)
     df.sort_index(inplace=True)
 
+    csv_name = input("Please enter desired name of exported csv file: ")
+
+    #Gets the time and concentration/total columns only
+    col_length = df.shape[1]
+    midpt = int((col_length)/2) + 1
+    df1 = df.iloc[:,midpt:]
+    p = Path('Exported Data')
+    p.mkdir(exist_ok= True)
+    
+    #Exports .txt file of polymer/total
+    export_txt = df1.to_csv(os.getcwd() + '/' + str(p) + '/' + csv_name  +'.txt',sep='\t')
     #Exports the data to excel sheet
-    export = df.to_csv('Export_data_After_concfix.csv',sep=',')
+    export = df.to_csv(os.getcwd() + '/' + str(p) + '/' + csv_name  + '.csv',sep=',')
     return df
 
 
