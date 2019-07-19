@@ -69,7 +69,9 @@ fig,ax = plt.subplots(2,num_pts//2,sharex=True,sharey=True)
 #Initialize variables for row and column
 i = 0
 j = 1
-    
+
+#For mac
+#os.chdir(fsa_dir)
 #Parses through each fsa file in the directory
 for k in range(length_dir):
     #n = str(os.getcwd()) + '/' + fsa_dir + '/' + length_dir_name[k]
