@@ -21,7 +21,7 @@ import os
 #trace['DATA1'].index(max(trace['DATA1']))
 
 #Prompts user for number of time points and the y/x min and max
-print(os.getcwd())
+#print(os.getcwd())
 #Checks how many fsa files are in the directory. If not equal to the number
 #of time points entered, then requests user to enter number of time points again
 ##folder_check = input("If your .fsa files are in a folder, press 'y' to continue, else press 'n': ")
@@ -30,11 +30,18 @@ print(os.getcwd())
 ##    length_dir = len(os.listdir(fsa_dir + '/'))
 ##    length_dir_name = os.listdir(fsa_dir + '/')
 
-dir_name = os.listdir(os.getcwd())
+#Make sure you have a folder that contains all the .fsa files
+#Then make sure this script is outside of that folder
+folder_check = input("If your .fsa files are in a folder, press 'y' to continue, else press 'n': ")
+if folder_check == 'y' or folder_check == 'Y':
+    fsa_dir = input('Please enter the name of the folder with the .fsa files: ')
+    dir_name = os.getcwd() + '\\' +  fsa_dir 
+    os.chdir(dir_name)
+    print(os.getcwd())
 #Checks number of .fsa files in the directory
-fsa_names = [x for x in dir_name if x.endswith('.fsa')]
-length_dir = len([x for x in dir_name if x.endswith('.fsa')])
-
+fsa_names = [x for x in os.listdir(dir_name) if x.endswith('.fsa')]
+length_dir = len(fsa_names)
+print(fsa_names)
 num_pts = int(input("Please enter number of time points: "))
 while length_dir > num_pts or length_dir < num_pts:
     num_pts = int(input("Number of time points not consistent \
@@ -144,10 +151,4 @@ fig.suptitle('Chromatogram Peaks')
 fig.text(0.04,0.5,'RFU', va='center', rotation='vertical')
 
 plt.show()
-
-
-
-
-
-
 
