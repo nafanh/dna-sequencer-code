@@ -21,7 +21,7 @@ import os
 #trace['DATA1'].index(max(trace['DATA1']))
 
 #Prompts user for number of time points and the y/x min and max
-#print(os.getcwd())
+print(os.getcwd())
 #Checks how many fsa files are in the directory. If not equal to the number
 #of time points entered, then requests user to enter number of time points again
 ##folder_check = input("If your .fsa files are in a folder, press 'y' to continue, else press 'n': ")
