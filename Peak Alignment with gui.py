@@ -1,11 +1,11 @@
-#!/usr/bin/env python3
+#! python3
 from Bio import SeqIO
 from collections import defaultdict
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-
+import gui
 #Program works so you don't have to use the cmd line dir>/b
 
 #In order to get the text file name from the folder
@@ -21,65 +21,75 @@ import os
 #trace['DATA1'].index(max(trace['DATA1']))
 
 #Prompts user for number of time points and the y/x min and max
-#print(os.getcwd())
+
 #Checks how many fsa files are in the directory. If not equal to the number
 #of time points entered, then requests user to enter number of time points again
-##folder_check = input("If your .fsa files are in a folder, press 'y' to continue, else press 'n': ")
-##if folder_check == 'y' or folder_check == 'Y':
-##    fsa_dir = input('Please enter the name of the folder with the .fsa files: ')
-##    length_dir = len(os.listdir(fsa_dir + '/'))
-##    length_dir_name = os.listdir(fsa_dir + '/')
 
-dir_name = os.listdir(os.getcwd())
-#Checks number of .fsa files in the directory
-fsa_names = [x for x in dir_name if x.endswith('.fsa')]
-length_dir = len([x for x in dir_name if x.endswith('.fsa')])
+#Try this for Gui
+folder_check = gui.is_folder
+#folder_check = input("If your .fsa files are in a folder, press 'y' to continue, else press 'n': ")
+if folder_check == 'y' or folder_check == 'Y':
 
-num_pts = int(input("Please enter number of time points: "))
-while length_dir > num_pts or length_dir < num_pts:
-    num_pts = int(input("Number of time points not consistent \
-with the number of .fsa files. Please enter number of time points again: "))
-x_min = int(input("Please enter the min. x value: "))
-x_max = int(input("Please enter max x value: "))
-while x_min > x_max:
-    x_min = int(input("x value minimum is greater than x value max, please try again. x min value: "))
-    x_max = int(input("Please enter max x value: "))
-y_min = int(input("Please enter min y value: "))
-y_max = int(input("Please enter max y value: "))
-while y_min > y_max:
-    y_min = int(input("y value minimum is greater than y value max, please try again. y min value: "))
-    y_max = int(input("Please enter max y value: "))
-##else:
-###In order to get file names of the fsa plots, go to run -->
-###cmd --> cd (place where file is contained)
-###Ex: cd downloads --> cd --> re --> dir/b >(desiredname.txt)
-###This converts the names into txt file into the folder with fsa files
-###opens up text file containing the names of fsa scripts
-##    file_name = input("Please enter file name (.txt format) ex: DNA.txt. Please only use if your \
-##.fsa files are in the scripts folder along with the .txt file containing \
-##the names of the .fsa files: ")
-##    file = open(file_name,'r')
-##    file.readline()
+    #Try this for Gui
+    fsa_dir = gui.f_name
+    #fsa_dir = input('Please enter the name of the folder with the .fsa files: ')
+    fsa_dir = os.getcwd() + '\\' + fsa_dir 
+    fsa_dir_list = os.listdir(fsa_dir)
+    #print(fsa_dir)
+    fsa_names = [x for x in fsa_dir_list if x.endswith('.fsa')]
+    length_dir = len(fsa_names)
+    #num_pts = int(input("Please enter number of time points: "))
+    #Try for GUI
+    num_pts = gui.time
+    while length_dir > num_pts or length_dir < num_pts:
+        num_pts = int(input("Number of time points not consistent \
+    with the number of .fsa files. Please enter number of time points again: "))
 
+    #Try for GUI
+    x_min = gui.x_min
+    x_max = gui.x_max
+##    x_min = int(input("Please enter the min. x value: "))
+##    x_max = int(input("Please enter max x value: "))
+    while x_min > x_max:
+        x_min = int(input("x value minimum is greater than x value max, please try again. x min value: "))
+        x_max = int(input("Please enter max x value: "))
+
+    #Try for GUI
+    y_min = gui.y_min
+    y_max = gui.y_max
+##    y_min = int(input("Please enter min y value: "))
+##    y_max = int(input("Please enter max y value: "))
+    while y_min > y_max:
+        y_min = int(input("y value minimum is greater than y value max, please try again. y min value: "))
+        y_max = int(input("Please enter max y value: "))
+else:
+#In order to get file names of the fsa plots, go to run -->
+#cmd --> cd (place where file is contained)
+#Ex: cd downloads --> cd --> re --> dir/b >(desiredname.txt)
+#This converts the names into txt file into the folder with fsa files
+#opens up text file containing the names of fsa scripts
+    file_name = input("Please enter file name (.txt format) ex: DNA.txt. Please only use if your \
+.fsa files are in the scripts folder along with the .txt file containing \
+the names of the .fsa files: ")
+    file = open(file_name,'r')
+    file.readline()
 
 
 #Creates figure, axis objects for subplot
 fig,ax = plt.subplots(2,num_pts//2,sharex=True,sharey=True)
 
+
 #Initialize variables for row and column
 i = 0
 j = 1
-
-#For mac
-#os.chdir(fsa_dir)
+    
 #Parses through each fsa file in the directory
 for k in range(length_dir):
-    #n = str(os.getcwd()) + '/' + fsa_dir + '/' + length_dir_name[k]
     #Takes first time point as the standard reference peak
     if k == 0:
-        first_dp_split = fsa_names[k].split('_')
+        first_dp_split = fsa_names[0].split('_')
         time = first_dp_split[2]
-        standard = SeqIO.read(fsa_names[k],'abi')
+        standard = SeqIO.read(fsa_names[0],'abi')
         s_abif_key = standard.annotations['abif_raw'].keys()
         s_trace = defaultdict(list)
         s_channels = ['DATA1']
