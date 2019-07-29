@@ -5,35 +5,39 @@ import tkinter as tk
 def in_folder():
     global is_folder
     is_folder = var.get()
+    but.configure(bg='green')
+    
 
 def folder_name():
     global f_name
     f_name = var2.get()
-    
+    but2.configure(bg='green')
 def time_pts():
     global time
     time = var3.get()
-    
+    but3.configure(bg='green')
 def get_x_min():
     global x_min
     x_min = var4.get()
+    but4.configure(bg='green')
 
 def get_x_max():
     global x_max
     x_max = var5.get()
-
+    but5.configure(bg='green')
 def get_y_min():
     global y_min
     y_min = var6.get()
-
+    but6.configure(bg='green')
 def get_y_max():
     global y_max
     y_max = var7.get()
-
+    but7.configure(bg='green')
   
 # --- main ---
 
 root = tk.Tk()
+root.title('Peak Alignment Parameters')
 
 var = tk.StringVar()
 var2 = tk.StringVar()
@@ -74,16 +78,23 @@ ent7 = tk.Entry(root, textvariable=var7)
 ent7.grid(row=6,column=1)
 
 
-but = tk.Button(root, text="Enter", command=in_folder).grid(row=0,column=3)
-but2 = tk.Button(root, text="Enter", command=folder_name).grid(row=1,column=3)
-but3 = tk.Button(root, text="Enter", command=time_pts).grid(row=2,column=3)
-but4 = tk.Button(root, text="Enter", command=get_x_min).grid(row=3,column=3)
-but5 = tk.Button(root, text="Enter", command=get_x_max).grid(row=4,column=3)
-but6 = tk.Button(root, text="Enter", command=get_y_min).grid(row=5,column=3)
-but7 = tk.Button(root, text="Enter", command=get_y_max).grid(row=6,column=3)
+but = tk.Button(root, text="Enter", command=in_folder)
+but.grid(row=0,column=3)
+but2 = tk.Button(root, text="Enter", command=folder_name)
+but2.grid(row=1,column=3)
+but3 = tk.Button(root, text="Enter", command=time_pts)
+but3.grid(row=2,column=3)
+but4 = tk.Button(root, text="Enter", command=get_x_min)
+but4.grid(row=3,column=3)
+but5 = tk.Button(root, text="Enter", command=get_x_max)
+but5.grid(row=4,column=3)
+but6 = tk.Button(root, text="Enter", command=get_y_min)
+but6.grid(row=5,column=3)
+but7 = tk.Button(root, text="Enter", command=get_y_max)
+but7.grid(row=6,column=3)
 
 tk.Button(root, 
-          text='Quit', 
+          text='Done', 
           command=root.quit).grid(row=7, 
                                     column=0, 
                                     sticky=tk.W, 
