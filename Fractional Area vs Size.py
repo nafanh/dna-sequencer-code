@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#! python3
+
 import pandas as pd
 import numpy as np
 import re
@@ -7,6 +8,7 @@ import matplotlib.pyplot as plt
 import math
 import os
 from pathlib import Path
+
 #Gets a number from string and sorts it into a list
 #Two functions used for sorting the length of the polymers into columns
 def atoi(text):
@@ -101,7 +103,7 @@ def sample_distance(filtered_data):
    
     #Exports the internal standard data
     #export_int_std = df_int_std.to_csv('Export_data_int_std.csv',sep = ',')
-    # print(df_int_std)
+    print(df_int_std)
 
     # makes list of int standard data points
     int_stdlist = df_int_std['Data Point'].tolist()
@@ -342,6 +344,7 @@ def get_frac_values(df):
     midpt = int((col_length)/2) + 1
     df1 = df.iloc[:,midpt:]
     df1_values = df1.values.tolist()
+    
     return df1_values
 #Gets the time values from the index
 def get_time_values(df):
@@ -359,7 +362,9 @@ def conc_fix(df):
             df.loc[:,head] = df.loc[:,head] * conc
     df = df.fillna(0)
     df.sort_index(inplace=True)
-
+    col_length = df.shape[1]
+    midpt = int((col_length)/2) + 1
+    df_without = df.iloc[:,midpt:]
     csv_name = input("Please enter desired name of exported csv file: ")
 
     #Gets the time and concentration/total columns only
@@ -373,6 +378,9 @@ def conc_fix(df):
     export_txt = df1.to_csv(os.getcwd() + '/' + str(p) + '/' + csv_name  +'.txt',sep='\t')
     #Exports the data to excel sheet
     export = df.to_csv(os.getcwd() + '/' + str(p) + '/' + csv_name  + '.csv',sep=',')
+    #df_without_size = df.loc
+    #Exports the data to excel sheet
+    #export = df.to_csv('Export_data_After_concfix.csv',sep=',')
     return df
 
 
@@ -427,11 +435,8 @@ def plot(time,size,frac):
     
     
 def main():
-##    Uncomment line below if you want to enter the text file name manually
-##    name = input('Enter file name (.txt): ')
-    dir_name_list = os.listdir(os.getcwd())
-    name = [x for x in dir_name_list if x.endswith('.txt')]
-    filtered = filtered_data(name[0]) #Creates table filtered by height threshold
+    name = input('Enter file name (.txt): ')
+    filtered = filtered_data(name) #Creates table filtered by height threshold
 
     #Adds column to table for distance to int. std.
     int_std_dist = sample_distance(filtered)
@@ -459,7 +464,7 @@ def main():
     time = get_time_values(a)
     length = get_size_values(polymer)
     frac = get_frac_values(a)
-   
+    
     ##print(get_frac_values(a))
     ##print(a.index.values.tolist())
     print()
