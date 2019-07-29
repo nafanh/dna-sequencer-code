@@ -21,7 +21,7 @@ import os
 #trace['DATA1'].index(max(trace['DATA1']))
 
 #Prompts user for number of time points and the y/x min and max
-print(os.getcwd())
+#print(os.getcwd())
 #Checks how many fsa files are in the directory. If not equal to the number
 #of time points entered, then requests user to enter number of time points again
 ##folder_check = input("If your .fsa files are in a folder, press 'y' to continue, else press 'n': ")
@@ -30,6 +30,10 @@ print(os.getcwd())
 ##    length_dir = len(os.listdir(fsa_dir + '/'))
 ##    length_dir_name = os.listdir(fsa_dir + '/')
 
+#This .py file must be in the same directory (folder) as the .fsa files
+#If you want an alternate version of this program, you can change it to where you enter the folder
+#with the .fsa files. The code is commented above with double pound signs. You can uncomment if you want
+#.fsa files in separate folder.
 dir_name = os.listdir(os.getcwd())
 #Checks number of .fsa files in the directory
 fsa_names = [x for x in dir_name if x.endswith('.fsa')]
