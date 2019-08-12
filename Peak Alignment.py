@@ -37,11 +37,28 @@ if folder_check == 'y' or folder_check == 'Y':
     fsa_dir = input('Please enter the name of the folder with the .fsa files: ')
     dir_name = os.getcwd() + '\\' +  fsa_dir 
     os.chdir(dir_name)
-    print(os.getcwd())
+    #print(os.getcwd())
 #Checks number of .fsa files in the directory
 fsa_names = [x for x in os.listdir(dir_name) if x.endswith('.fsa')]
 length_dir = len(fsa_names)
-print(fsa_names)
+#print(fsa_names)
+
+####Sorts the .fsa files by chronological order
+
+
+for i in range(len(fsa_names)):
+    fsa_split = fsa_names[i].split('_')
+    time_min = float(fsa_split[2])
+    min_pos = i
+
+    for j in range(i + 1, len(fsa_names)):
+        fsa_split_next = fsa_names[j].split('_')
+        time_next = float(fsa_split_next[2])
+        if time_next < time_min:
+            min_pos = j
+    fsa_names[min_pos],fsa_names[i] = fsa_names[i],fsa_names[min_pos]
+
+
 num_pts = int(input("Please enter number of time points: "))
 while length_dir > num_pts or length_dir < num_pts:
     num_pts = int(input("Number of time points not consistent \
@@ -56,6 +73,7 @@ y_max = int(input("Please enter max y value: "))
 while y_min > y_max:
     y_min = int(input("y value minimum is greater than y value max, please try again. y min value: "))
     y_max = int(input("Please enter max y value: "))
+
 ##else:
 ###In order to get file names of the fsa plots, go to run -->
 ###cmd --> cd (place where file is contained)
