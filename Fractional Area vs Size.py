@@ -125,8 +125,6 @@ def sample_distance(filtered_data):
     #zips the sample time points and data points into a nested list
     # Ex: [[1,2],[3,4]]
     sample_2d = [list(a) for a in zip(sample_timelist, sample_list)]
-
-    #pprint.pprint(sample_2d)
     
     # if sample_2d[i][0] in int_std_dict:
 
@@ -138,7 +136,8 @@ def sample_distance(filtered_data):
         #Subtracts the internal std value by the sample datapoint
         #Method is inefficient, could probably use nested list
         # for the internal standards as well
-        diff = int(int_std_dict[sample_2d[i][0]]) - int(sample_2d[i][1])
+        #diff = int(int_std_dict[sample_2d[i][0]]) - int(sample_2d[i][1])
+        diff = float(int(sample_2d[i][1])/int(int_std_dict[sample_2d[i][0]]))
         diff_list.append(diff)
 
     #This is to prevent pandas SettingwithCopyWarning
@@ -192,8 +191,8 @@ def size(df):
         length.append(polymer)
         while True:
             try:
-                low_r = int(input("Enter lower bound of diff: "))          
-                upper_r = int(input("Enter upper bound of diff: "))
+                low_r = float(input("Enter lower bound of diff: "))          
+                upper_r = float(input("Enter upper bound of diff: "))
                 temp.append(low_r)
                 temp.append(upper_r)
                 #Adds nested list of lower and upper bounds to list
@@ -217,7 +216,7 @@ def size(df):
     #print(ranges_dict)
 
     #Takes difference values to list
-    diff_list = df['Diff'].astype(int).tolist()
+    diff_list = df['Diff'].astype(float).tolist()
 
     #Gets the keys of the dictionary which are the polymer sizes
     ranges_keys = list(ranges_dict.keys())
@@ -375,9 +374,9 @@ def conc_fix(df):
     p.mkdir(exist_ok= True)
     
     #Exports .txt file of polymer/total
-    export_txt = df1.to_csv(os.getcwd() + '/' + str(p) + '/' + csv_name  +'.txt',sep='\t')
+    export_txt = df1.to_csv(os.getcwd() + '\\' + str(p) + '\\' + csv_name  +'.txt',sep='\t')
     #Exports the data to excel sheet
-    export = df.to_csv(os.getcwd() + '/' + str(p) + '/' + csv_name  + '.csv',sep=',')
+    export = df.to_csv(os.getcwd() + '\\' + str(p) +  '\\' + csv_name  + '.csv',sep=',')
     #df_without_size = df.loc
     #Exports the data to excel sheet
     #export = df.to_csv('Export_data_After_concfix.csv',sep=',')
