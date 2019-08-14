@@ -635,7 +635,7 @@ while y_min > y_max:
 ##    file = open(file_name,'r')
 ##    file.readline()
 
-sns.set()
+sns.set(rc={'axes.facecolor':'cornflowerblue'})
 # Creates figure, axis objects for subplot
 fig, ax = plt.subplots(2, num_pts // 2, sharex=True, sharey=True)
 
