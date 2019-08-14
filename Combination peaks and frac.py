@@ -30,6 +30,7 @@ def natural_keys(text):
 # ex: Exo_BurstMM_0.5_TLD_2018-12-18_A06.fsa
 # Ex: PT_100nM_0_TLD_4.2.19_1_2019-04-02_A05.fsa
 skip_frac = input("Do you want to skip fractional area vs. size and just plot the graphs? ('y' for yes and 'n' for no'): ")
+print('-------------------------------------------------------\n')
 if skip_frac == 'n' or skip_frac == 'N':
 
     time_underscore = int(
@@ -96,9 +97,11 @@ if skip_frac == 'n' or skip_frac == 'N':
         # is above internal standard height, then error will raise
         # have to add try/except block here for future use
         df_int_all = df.loc[df['Dye'] == 'Y']
+        print('-------------------------------------------------------\n')
         print("These are all the internal std. peaks\n")
         print('---------------------------------------')
         print(df_int_all)
+        print()
         min_height = int(input("Please enter the minimum height (make sure \
     bigger than int std desired): "))
         df_hmin = df.loc[df['Height'].astype(int) > min_height]
@@ -123,6 +126,7 @@ if skip_frac == 'n' or skip_frac == 'N':
         print('Here are the internal std. peaks filtered: ')
         print('-------------------------------------------------------')
         print(df_int_std)
+        print()
 
         # makes list of int standard data points
         int_stdlist = df_int_std['Data Point'].tolist()
@@ -469,6 +473,7 @@ if skip_frac == 'n' or skip_frac == 'N':
 
         # Returns a pandas series of difference ranges
         print('Here are the difference ranges between peak and internal standard: ')
+        print('--------------------------------------------------------')
         print(diff_list(int_std_dist))
         print(int_std_dist)
 
@@ -596,8 +601,9 @@ print('The number of time points is:',len(time_list))
 print('--------------------------------------------------------------')
 print('Here are the file names the program is aligning:')
 print('--------------------------------------------------------------\n')
-pprint.pprint(fsa_names_sorted)
-
+for x in fsa_names_sorted: print (x)
+print()
+print('---------------------------------------------------------------')
 ##    if name_list[time_underscore] == '0':
 ##        name_list[time_underscore] == '0.0'
 ##    fsa_names.pop(i)
